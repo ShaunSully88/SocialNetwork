@@ -56,29 +56,25 @@ const thoughtController = {
           .catch(err => res.status(400).json(err));
       },
   
-    removeThought({ params, body }, res) {
+    removeThought({ params}, res) {
       Thought.findOneAndDelete(
-          { _id: params.thoughtId}
+          { _id: params.id}
       )
       .then(deleteThought => {
           if (!deleteThought) {
-              rs.status(404).json({ message: 'No thought with this id'});
+              res.status(404).json({ message: 'No thought with this id'});
+              return User.findOneAndUpdate(
+                { _id: params.userId },
+                { $pull: { thoughts: id }},
+                { new: true }
+              );
           }
-          return User.findOneAndUpdate(
-              { _id: params.userId },
-              { $pull: { thoughts: _id } },
-              { new: true }
-          );
-      })
-      .then(dbUserData => {
-          if(!dbUserData) {
-              res.status(404).json({ message: 'No User with this id'});
-              return;
-          }
-          res.json(dbUserData);
+           
+      res.json(deleteThought);
       })
       .catch(err => res.json(err));
-  },
+    },
+  
 
       addReaction({ params, body }, res) {
         Thought.findOneAndUpdate(
